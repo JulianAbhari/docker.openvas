@@ -49,18 +49,49 @@ Give this task the name of “virtual subnet scan” and be sure that scan targe
 After creating this task you should see an “actions” bar to the far right of your newly created task, and there’s a play button that will run the task. Click the button to do a vulnerability scan.
 
 ## 12
-To create a docker-compose.yml file, run this command:
-`docker run -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro --restart always --log-out max-size=1g nginx`
+Finally, in order to create a docker-compose.yml file for OpenVAS, we need to install docker-compose on our VM.
+I did this using this command:
+`sudo apt install docker-compose`
 
-When opened the file looked like this for me:
+## 13
+After installing I checked the docker-compose version to make sure it worked:
+`docker-compose -v`
+
+## 14
+I then made a directory for the openvas docker-compose.yml file and changed my directory to the newly created one:
+`mkdir openvas`
+`cd openvas`
+
+## 15
+I then used touch to create a new docker-compose.yml file:
+`touch docker-compose.yml`
+
+## 16
+Now to add info in the file:
+`nano docker-compose.yml`
+
+## 17
+I added in this text block that I found online for openvas using docker 3.3
 ```
-version: '3.3'
+version: “3.3”
 services:
-    nginx:
-        ports:
-            - '80:80'
-        volumes:
-            - '/var/run/docker.sock:/tmp/docker.sock:ro'
-        restart: always
-        image: nginx
+openvas:
+     restart: always
+     image: mikesplain/openvas
+     hostname: openvas
+     expose:
+       - "443"
+     volumes:
+       - "./data/openvas:/var/lib/openvas/mgr/"
+     environment:
+       # CHANGE THIS !
+       OV_PASSWORD: admin
+     labels:
+        deck-chores.dump.command: sh -c "greenbone-nvt-sync; openvasmd --rebuild --progress"
+        deck-chores.dump.interval: daily
+
 ```
+## 18
+Finally I ran this in the same directory as the containers:
+`docker-compose up -d`
+
