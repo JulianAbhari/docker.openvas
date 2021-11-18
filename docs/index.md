@@ -54,4 +54,13 @@ To create a docker-compose.yml file, run this command:
 
 When opened the file looked like this for me:
 ```
+version: '3.3'
+services:
+    nginx:
+        ports:
+            - '80:80'
+        volumes:
+            - '/var/run/docker.sock:/tmp/docker.sock:ro'
+        restart: always
+        image: nginx
 ```
